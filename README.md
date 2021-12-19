@@ -1,5 +1,9 @@
 # devops
-Requisito de hardware
+Requisito mínimo  de hardware
+
+2   -  CPU
+6GB -  Mem
+
 
 ssh -i "../tj-aws-console.pem" ubuntu@ip   - Rancher Server      \ 
 ssh -i "../tj-aws-console.pem" ubuntu@ip   - k8s1                \
