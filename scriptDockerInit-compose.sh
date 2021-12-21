@@ -18,19 +18,66 @@ git clone https://github.com/jonathanbaraldi/devops.git
 
 cd /home/ubuntu/devops/exercicios/app/redis
 
-docker build -t thiagojaime/redis:devops .
-
-docker run -d --name redis -p 6379:6379 thiagojaime/redis:devops
+docker build -t thiagojaime/redis:devops . 
 
 cd /home/ubuntu/devops/exercicios/app/node
 
-docker build -t thiagojaime/node:devops .
-
-docker run -d --name node -p 8080:8080 --link redis thiagojaime/node:devops
+docker build -t thiagojaime/node:devops . 
 
 cd /home/ubuntu/devops/exercicios/app/nginx
 
 docker build -t thiagojaime/nginx:devops . 
 
-docker run -d --name nginx -p 80:80 --link node thiagojaime/nginx:devops
+tee -a docker-compose.yml <<EOF
+# Versão 2 do Docker-Compose
+version: '2'
 
+services:
+    
+    nginx:
+        restart: "always"
+        image: thiagojaime/nginx:devops
+        ports:
+            - "80:80"
+        links:
+            # Colocar mais nós para escalar
+            - node
+            # - node-2
+            
+    redis:
+        restart: "always"
+        image: thiagojaime/redis:devops
+        ports:
+            - 6379
+
+    mysql:
+        restart: "always"
+        image: mysql
+        ports:
+            - 3306
+        environment:
+            MYSQL_ROOT_PASSWORD: 123
+            MYSQL_DATABASE: books
+            MYSQL_USER: apitreinamento
+            MYSQL_PASSWORD: 123 
+    
+# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    node:
+        restart: "always"
+        image: thiagojaime/node:devops
+        links:
+            - redis
+            - mysql
+        ports:
+            - 8080
+        volumes:
+            -  volumeteste:/tmp/volumeteste
+    
+# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+# Mapeamento dos volumes
+volumes:
+    volumeteste:
+        external: false
+EOF
