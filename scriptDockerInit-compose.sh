@@ -28,6 +28,8 @@ cd /home/ubuntu/devops/exercicios/app/nginx
 
 docker build -t thiagojaime/nginx:devops . 
 
+cd /home/ubuntu/devops/
+
 tee -a docker-compose.yml <<EOF
 # Versão 2 do Docker-Compose
 version: '2'
@@ -81,3 +83,6 @@ volumes:
     volumeteste:
         external: false
 EOF
+
+docker-compose -f docker-compose.yml up -d
+
